@@ -1,0 +1,7 @@
+    region                  = "eu-central-1"
+    db_name                 = "projects"
+    engine                  = "postgres"
+    db_family               = "postgres16"
+    major_engine_version    = "16"
+    s3_bucket_name = "api-database"
+    lambda_function_name = "api-lambda"
