@@ -2,7 +2,9 @@
 
 ## Description
 
-![Alt text](api.png)
+<p align="center">
+    <img src="api.png" alt="API Diagram">
+</p>
 
 This repository contains a FastAPI application that is designed to be deployed on AWS using Lambda functions and API Gateway. The application leverages AWS RDS for database operations and S3 for storage. This setup provides a scalable, serverless architecture for your API, allowing it to handle high loads and traffic spikes efficiently. This project is ideal for developers who are looking to deploy their FastAPI applications on AWS and want to leverage the power of serverless architecture.
 
