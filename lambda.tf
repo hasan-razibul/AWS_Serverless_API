@@ -1,3 +1,8 @@
+data "archive_file" "placeholder_zip" {
+  type        = "zip"
+  source_file = "placeholder.py"
+  output_path = "placeholder.zip"
+}
 module "api_lambda" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "7.2.2"
@@ -12,6 +17,12 @@ module "api_lambda" {
   publish                           = true
   ignore_source_code_hash           = true
   cloudwatch_logs_retention_in_days = 365
+  allowed_triggers = {
+    APIGatewayAny = {
+      service    = "apigateway"
+      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
+    }
+  }
 
   environment_variables = {
     DB_URL = module.api_database.db_instance_endpoint,

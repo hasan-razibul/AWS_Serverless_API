@@ -1,7 +1,7 @@
 import os
 from typing import List
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
-import uvicorn
+from mangum import Mangum
 import io
 import boto3
 from fastapi.responses import StreamingResponse
@@ -11,6 +11,7 @@ import crud
 import models
 import schemas
 from database import SessionLocal, engine
+from apig_wsgi import make_lambda_handler
 
 s3_bucket_name = os.environ.get('S3_BUCKET_NAME')
 
@@ -74,33 +75,10 @@ async def update_project(
     pdf: UploadFile = File(None), 
     db: Session = Depends(get_db)
 ):
-    db_project = crud.get_project(db, project_id=project_id)
+    project = schemas.ProjectCreate(name=name, description=description, status=status)
+    db_project = crud.update_project(db, project_id=project_id, project=project, pdf=pdf)
     if db_project is None:
         raise HTTPException(status_code=404, detail="Project not found")
-
-    if name is not None:
-        db_project.name = name
-    if description is not None:
-        db_project.description = description
-    if status is not None:
-        db_project.status = status
-    if pdf is not None:
-        s3 = boto3.client('s3')
-
-        # delete the old file
-        if db_project.pdf:
-            o = urlparse(db_project.pdf)
-            old_file_path = o.path.lstrip('/')
-            s3.delete_object(Bucket=s3_bucket_name, Key=old_file_path)
-
-        # upload the new file to S3
-        s3.put_object(Body=await pdf.read(), Bucket=s3_bucket_name, Key=pdf.filename)
-
-        # update the database record with the new file's URL
-        db_project.pdf = f"s3://{s3_bucket_name}/{pdf.filename}"
-
-    db.commit()
-    db.refresh(db_project)
     return db_project
 
 
@@ -123,5 +101,4 @@ async def delete_project(project_id: int, db: Session = Depends(get_db)):
     
     return crud.delete_project(db=db, project_id=project_id)
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+lambda_handler = Mangum(app)

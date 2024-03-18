@@ -64,3 +64,49 @@ resource "aws_iam_role_policy_attachment" "api_lambda_role_policy_attachment" {
   policy_arn = aws_iam_policy.api_lambda_s3_and_secrets_cloudwatch_access_policy.arn
   role       = aws_iam_role.api_lambda_role.name
 }
+
+resource "aws_iam_role" "api_gateway" {
+  name = "api_gateway_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "invoke_policy" {
+  name = "project-api-lambda-invoke-policy"
+
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+   {
+        "Effect": "Allow",
+        "Action": [
+            "lambda:InvokeFunction"
+        ],
+        "Resource": [
+          "${module.api_lambda.lambda_function_invoke_arn}"
+        ]
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_iam_role_policy_attachment" "api_gateway_invoke_lambda" {
+  role       = aws_iam_role.api_gateway.name
+  policy_arn = aws_iam_policy.invoke_policy.arn
+}

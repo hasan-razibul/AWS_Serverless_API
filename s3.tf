@@ -13,7 +13,7 @@ module "s3_bucket" {
   restrict_public_buckets  = true
 
   versioning = {
-    status     = true
+    status     = false
     mfa_delete = false
   }
 
