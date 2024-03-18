@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script is used to deploy a Python application to AWS Lambda.
-# Usage: ./deploy.sh <app_directory> <lambda_function_name> <region>
+# Usage: ./lambda_deploy.sh <app_directory> <lambda_function_name> <region>
 
 # Check if the correct number of arguments were provided
 if [ "$#" -ne 3 ]; then
