@@ -12,12 +12,7 @@ module "api_gateway" {
     allow_methods = ["*"]
     allow_origins = ["*"]
   }
-
-#   # Access logs
-#   default_stage_access_log_destination_arn = "arn:aws:logs:eu-west-1:835367859851:log-group:debug-apigateway"
-#   default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
-
-  # Routes and integrations
+  
   integrations = {
     "ANY /" = {
       lambda_arn             = module.api_lambda.lambda_function_arn
